@@ -33,28 +33,17 @@ module OmniAuth
       rescue ::Errno::ETIMEDOUT
         raise ::Timeout::Error
       end
-      
-      def authorize_params
-        super.tap do |params|
-          params[:x_auth_access_type] = (params[:x_auth_access_type] || "read")
-          params[:force_login] = 'true' if params[:force_login].nil?
-          params[:approval_prompt] = 'force' if params[:approval_prompt].nil?
-          if screen_name && !screen_name.empty?
-            params[:screen_name] = session['omniauth.params']['screen_name']
-          end
-        end
-      end
 
-#      alias :old_request_phase :request_phase
-#
-#      def request_phase 
-#        screen_name = session['omniauth.params']['screen_name']
-#        if screen_name && !screen_name.empty?
-#          options[:authorize_params] ||= {}
-#          options[:authorize_params].merge!(:force_login => 'true', :screen_name => screen_name)
-#        end
-#        old_request_phase
-#      end
+      alias :old_request_phase :request_phase
+
+      def request_phase 
+        screen_name = session['omniauth.params']['screen_name']
+        if screen_name && !screen_name.empty?
+          options[:authorize_params] ||= {}
+          options[:authorize_params].merge!(:force_login => 'true', :screen_name => screen_name)
+        end
+        old_request_phase
+      end
 
 
     end
